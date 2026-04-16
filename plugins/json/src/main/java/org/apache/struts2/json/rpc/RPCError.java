@@ -18,9 +18,6 @@
  */
 package org.apache.struts2.json.rpc;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
@@ -59,11 +56,12 @@ public class RPCError {
         this.name = t.getClass().getName();
 
         if (debug) {
-            StringWriter s = new StringWriter();
-            PrintWriter w = new PrintWriter(s);
-            t.printStackTrace(w);
-            w.flush();
-            this.stack = s.toString();
+            StringBuilder sb = new StringBuilder();
+            sb.append(t.toString());
+            for (StackTraceElement element : t.getStackTrace()) {
+                sb.append("\n\tat ").append(element);
+            }
+            this.stack = sb.toString();
         }
 
         LOG.error(t.getMessage(), t);
