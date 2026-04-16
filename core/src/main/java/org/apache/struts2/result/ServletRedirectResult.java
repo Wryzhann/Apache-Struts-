@@ -210,7 +210,7 @@ public class ServletRedirectResult extends StrutsResultSupport implements Reflec
             tmpLocation.append('#').append(anchor);
         }
 
-        finalLocation = response.encodeRedirectURL(tmpLocation.toString());
+        finalLocation = tmpLocation.toString();
 
         LOG.debug("Redirecting to finalLocation: {}", finalLocation);
 
