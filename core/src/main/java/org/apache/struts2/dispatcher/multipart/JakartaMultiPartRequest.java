@@ -22,6 +22,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.fileupload2.core.DiskFileItem;
 import org.apache.commons.fileupload2.core.RequestContext;
 import org.apache.commons.fileupload2.jakarta.servlet6.JakartaServletDiskFileUpload;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -217,7 +218,9 @@ public class JakartaMultiPartRequest extends AbstractMultiPartRequest {
         if (item.isInMemory()) {
             LOG.debug(() -> "Creating temporary file representing in-memory uploaded item: " + normalizeSpace(item.getFieldName()));
             try {
-                File tempFile = createTemporaryFile(item.getName(), Path.of(saveDir));
+                // Sanitize filename to prevent path traversal attacks
+                String sanitizedFileName = FilenameUtils.getName(item.getName());
+                File tempFile = createTemporaryFile(sanitizedFileName, Path.of(saveDir));
                 
                 // Track the temporary file for explicit cleanup
                 temporaryFiles.add(tempFile);
