@@ -217,7 +217,8 @@ public class JakartaMultiPartRequest extends AbstractMultiPartRequest {
         if (item.isInMemory()) {
             LOG.debug(() -> "Creating temporary file representing in-memory uploaded item: " + normalizeSpace(item.getFieldName()));
             try {
-                File tempFile = createTemporaryFile(item.getName(), Path.of(saveDir));
+                String sanitizedFileName = getCanonicalName(item.getName());
+                File tempFile = createTemporaryFile(sanitizedFileName, Path.of(saveDir));
                 
                 // Track the temporary file for explicit cleanup
                 temporaryFiles.add(tempFile);
