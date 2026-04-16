@@ -85,6 +85,7 @@ public class CookieProviderInterceptor extends AbstractInterceptor implements Pr
                     LOG.debug("Sending cookie [{}] with value [{}] for domain [{}]",
                             cookie.getName(), cookie.getValue(), (cookie.getDomain() != null ? cookie.getDomain() : "no domain"));
                 }
+                cookie.setHttpOnly(true);
                 response.addCookie(cookie);
             }
         }
