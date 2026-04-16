@@ -186,7 +186,7 @@ public class JSONInterceptor extends AbstractInterceptor {
 
             return Action.NONE;
         } else {
-            LOG.debug("Accept header parameter must be '{}' or '{}'. Ignoring request with Content Type '{}'", jsonContentType, jsonRpcContentType, requestContentType);
+            LOG.debug("Accept header parameter must be '{}' or '{}'. Ignoring request with Content Type '{}'", jsonContentType, jsonRpcContentType, sanitizeForLog(requestContentType));
         }
 
         return invocation.invoke();
@@ -198,6 +198,17 @@ public class JSONInterceptor extends AbstractInterceptor {
         reader.setMaxDepth(maxDepth);
         reader.setMaxStringLength(maxStringLength);
         reader.setMaxKeyLength(maxKeyLength);
+    }
+
+    /**
+     * Sanitizes a string for safe logging by removing control characters
+     * that could be used for log injection attacks.
+     */
+    private String sanitizeForLog(String value) {
+        if (value == null) {
+            return null;
+        }
+        return value.replaceAll("[\\r\\n]", "");
     }
 
     protected String readContentType(HttpServletRequest request) {
