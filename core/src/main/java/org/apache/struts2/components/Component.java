@@ -26,6 +26,7 @@ import org.apache.struts2.util.TextParseUtil;
 import org.apache.struts2.util.ValueStack;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -34,14 +35,12 @@ import org.apache.struts2.StrutsException;
 import org.apache.struts2.dispatcher.mapper.ActionMapper;
 import org.apache.struts2.dispatcher.mapper.ActionMapping;
 import org.apache.struts2.util.ComponentUtils;
-import org.apache.struts2.util.FastByteArrayOutputStream;
 import org.apache.struts2.views.annotations.StrutsTagAttribute;
 import org.apache.struts2.views.util.UrlHelper;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.Writer;
 import java.lang.reflect.Method;
 import java.util.Collection;
@@ -493,11 +492,7 @@ public class Component {
      * @return the exception as a string.
      */
     protected String toString(Throwable t) {
-        try (FastByteArrayOutputStream bout = new FastByteArrayOutputStream();
-             PrintWriter wrt = new PrintWriter(bout)) {
-            t.printStackTrace(wrt);
-            return bout.toString();
-        }
+        return ExceptionUtils.getStackTrace(t);
     }
 
     /**
