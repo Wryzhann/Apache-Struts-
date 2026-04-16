@@ -21,18 +21,21 @@
 package org.apache.struts2.showcase.chat;
 
 import org.apache.struts2.ActionSupport;
+import org.apache.struts2.action.SessionAware;
 import org.apache.struts2.interceptor.parameter.StrutsParameter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-public class MessagesAvailableInRoomAction extends ActionSupport {
+public class MessagesAvailableInRoomAction extends ActionSupport implements SessionAware {
 
 	private static final long serialVersionUID = 1L;
 
 	private String roomName;
 	private final ChatService chatService;
 	private List<ChatMessage> messagesAvailableInRoom = new ArrayList<>();
+	private Map<String, Object> session;
 
 	public String getRoomName() {
 		return this.roomName;
@@ -52,12 +55,21 @@ public class MessagesAvailableInRoomAction extends ActionSupport {
 	}
 
 	public String execute() throws Exception {
+		User user = (User) session.get(ChatAuthenticationInterceptor.USER_SESSION_KEY);
+		if (user == null) {
+			return LOGIN;
+		}
 		try {
 			messagesAvailableInRoom = chatService.getMessagesInRoom(roomName);
 		} catch (ChatException e) {
 			addActionError(e.getMessage());
 		}
 		return SUCCESS;
+	}
+
+	@Override
+	public void withSession(Map<String, Object> session) {
+		this.session = session;
 	}
 
 }
