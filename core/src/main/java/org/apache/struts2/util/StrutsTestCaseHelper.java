@@ -18,6 +18,8 @@
  */
 package org.apache.struts2.util;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.struts2.ActionContext;
 import org.apache.struts2.inject.Container;
 import org.apache.struts2.util.ValueStack;
@@ -37,6 +39,8 @@ import static org.apache.struts2.StrutsConstants.STRUTS_ALLOWLIST_ENABLE;
  * Generic test setup methods to be used with any unit testing framework.
  */
 public class StrutsTestCaseHelper {
+
+    private static final Logger LOG = LogManager.getLogger(StrutsTestCaseHelper.class);
 
     public static Dispatcher initDispatcher(ServletContext ctx, Map<String, String> params) {
         Map<String, String> finalParams = params != null ? new HashMap<>(params) : new HashMap<>();
@@ -85,8 +89,7 @@ public class StrutsTestCaseHelper {
         }
 
         public void handleError(HttpServletRequest request, HttpServletResponse response, int code, Exception e) {
-            System.out.println("Dispatcher#sendError: " + code);
-            e.printStackTrace(System.out);
+            LOG.error("Dispatcher#sendError: {}", code, e);
         }
     }
 
