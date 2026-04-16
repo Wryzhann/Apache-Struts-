@@ -25,9 +25,9 @@ import org.apache.struts2.interceptor.ValidationAware;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.struts2.ServletActionContext;
-import org.apache.struts2.result.Redirectable;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * This listener is used by {@link MessageStoreInterceptor} to store messages in HttpSession
@@ -37,6 +37,16 @@ import java.util.Map;
 public class MessageStorePreResultListener implements PreResultListener {
 
     private static final Logger LOG = LogManager.getLogger(MessageStorePreResultListener.class);
+
+    /**
+     * Known result class names that implement Redirectable.
+     * Using a whitelist avoids unsafe reflection via Class.forName() with untrusted input.
+     */
+    private static final Set<String> KNOWN_REDIRECTABLE_RESULTS = Set.of(
+        "org.apache.struts2.result.ServletRedirectResult",
+        "org.apache.struts2.result.ServletActionRedirectResult",
+        "org.apache.struts2.json.JSONActionRedirectResult"
+    );
 
     protected MessageStoreInterceptor interceptor;
 
@@ -95,16 +105,15 @@ public class MessageStorePreResultListener implements PreResultListener {
     }
 
     protected boolean isRedirect(ActionInvocation invocation, String resultCode) {
-        boolean isRedirect = false;
         try {
             ResultConfig resultConfig = invocation.getProxy().getConfig().getResults().get(resultCode);
             if (resultConfig != null) {
-                isRedirect = Redirectable.class.isAssignableFrom(Class.forName(resultConfig.getClassName()));
+                return KNOWN_REDIRECTABLE_RESULTS.contains(resultConfig.getClassName());
             }
         } catch (Exception e) {
             LOG.warn("Cannot read result!", e);
         }
-        return isRedirect;
+        return false;
     }
 
 }
