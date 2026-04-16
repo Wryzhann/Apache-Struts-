@@ -55,6 +55,7 @@ public abstract class CookieLocaleHandler extends AbstractStoredLocaleHandler {
 
         Cookie cookie = new Cookie(attributeName, locale.toString());
         cookie.setMaxAge(1209600); // two weeks
+        cookie.setHttpOnly(true);
         response.addCookie(cookie);
 
         return locale;
