@@ -37,6 +37,11 @@ function moveAllOptions(objSourceElement, objTargetElement, toSort, notMove1, no
     );
 }
 
+function escapeRegExp(string) {
+    // Escape special regex characters to prevent ReDoS attacks
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 function compile(ptn) {
     if (ptn !== undefined) {
         if (ptn === '' || !window.RegExp) {
@@ -44,7 +49,7 @@ function compile(ptn) {
                 return val === ptn;
             };
         } else {
-            var reg = new RegExp("^" + ptn + "$");
+            var reg = new RegExp("^" + escapeRegExp(ptn) + "$");
             return function (val) {
                 if (val === '') { // ignore empty option added by template
                     return true;
