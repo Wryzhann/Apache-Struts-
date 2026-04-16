@@ -26,11 +26,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.struts2.dispatcher.mapper.ActionMapper;
 import org.apache.struts2.dispatcher.mapper.ActionMapping;
 
+import org.apache.commons.text.StringEscapeUtils;
+
 import java.io.PrintWriter;
 import java.io.Serial;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 /**
@@ -104,7 +103,7 @@ public class PostbackResult extends StrutsResultSupport {
 
         // Render
         PrintWriter pw = new PrintWriter(response.getOutputStream());
-        pw.write("<!DOCTYPE html><html><body><form action=\"" + finalLocation + "\" method=\"POST\">");
+        pw.write("<!DOCTYPE html><html><body><form action=\"" + StringEscapeUtils.escapeHtml4(finalLocation) + "\" method=\"POST\">");
         writeFormElements(request, pw);
         writePrologueScript(pw);
         pw.write("</html>");
@@ -213,15 +212,15 @@ public class PostbackResult extends StrutsResultSupport {
         this.prependServletContext = prependServletContext;
     }
 
-    protected void writeFormElement(PrintWriter pw, String name, String[] values) throws UnsupportedEncodingException {
+    protected void writeFormElement(PrintWriter pw, String name, String[] values) {
         for (String value : values) {
-            String encName = URLEncoder.encode(name, StandardCharsets.UTF_8);
-            String encValue = URLEncoder.encode(value, StandardCharsets.UTF_8);
+            String encName = StringEscapeUtils.escapeHtml4(name);
+            String encValue = StringEscapeUtils.escapeHtml4(value);
             pw.write("<input type=\"hidden\" name=\"" + encName + "\" value=\"" + encValue + "\"/>");
         }
     }
 
-    private void writeFormElements(HttpServletRequest request, PrintWriter pw) throws UnsupportedEncodingException {
+    private void writeFormElements(HttpServletRequest request, PrintWriter pw) {
         Map<String, String[]> params = request.getParameterMap();
         for (Map.Entry<String, String[]> entry : params.entrySet()) {
             String name = entry.getKey();
