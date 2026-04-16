@@ -173,16 +173,14 @@ public class XWorkBasicConverter extends DefaultTypeConverter {
         return null;
     }
 
+    /**
+     * Conversion from String to Class is not supported for security reasons.
+     * Allowing arbitrary class loading from user input enables unsafe reflection attacks.
+     *
+     * @throws TypeConversionException always, as this conversion is not permitted
+     */
     private Class doConvertToClass(Object value) {
-        Class clazz = null;
-        if (value instanceof String st && !st.isEmpty()) {
-            try {
-                clazz = Class.forName(st);
-            } catch (ClassNotFoundException e) {
-                throw new TypeConversionException(e.getLocalizedMessage(), e);
-            }
-        }
-        return clazz;
+        throw new TypeConversionException("Conversion to Class type is not supported for security reasons");
     }
 
     private Object doConvertToCollection(Map<String, Object> context, Object o, Member member, String prop, Object value, Class toType) {
