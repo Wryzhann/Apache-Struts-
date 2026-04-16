@@ -18,11 +18,8 @@
  */
 package org.apache.struts2.interceptor;
 
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.Serial;
 import java.io.Serializable;
-import java.io.StringWriter;
 
 /**
  * <!-- START SNIPPET: javadoc -->
@@ -59,24 +56,36 @@ public class ExceptionHolder implements Serializable {
     }
 
     /**
-     * Gets the held exception stack trace using {@link Exception#printStackTrace()}.
+     * Gets the held exception stack trace.
      *
      * @return stack trace
      */
     public String getExceptionStack() {
-        String exceptionStack = null;
-
-        if (getException() != null) {
-            try (StringWriter sw = new StringWriter();
-                    PrintWriter pw = new PrintWriter(sw)) {
-                getException().printStackTrace(pw);
-                exceptionStack = sw.toString();
-            } catch (IOException e) {
-                // Ignore exception generating stack trace.
-            }
+        if (getException() == null) {
+            return null;
         }
 
-        return exceptionStack;
+        StringBuilder sb = new StringBuilder();
+        formatThrowable(sb, getException());
+        return sb.toString();
+    }
+
+    private void formatThrowable(StringBuilder sb, Throwable t) {
+        sb.append(t).append(System.lineSeparator());
+        for (StackTraceElement element : t.getStackTrace()) {
+            sb.append("\tat ").append(element).append(System.lineSeparator());
+        }
+
+        for (Throwable suppressed : t.getSuppressed()) {
+            sb.append("Suppressed: ");
+            formatThrowable(sb, suppressed);
+        }
+
+        Throwable cause = t.getCause();
+        if (cause != null) {
+            sb.append("Caused by: ");
+            formatThrowable(sb, cause);
+        }
     }
 
 }
