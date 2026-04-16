@@ -41,6 +41,11 @@ import static org.apache.commons.lang3.BooleanUtils.isTrue;
 public class StrutsRequestWrapper extends HttpServletRequestWrapper {
 
     private static final String REQUEST_WRAPPER_GET_ATTRIBUTE = "__requestWrapper.getAttribute";
+    /**
+     * Pattern for safe attribute names that can be looked up on the value stack.
+     * Only allows alphanumeric characters, underscores, and dots (for nested properties).
+     */
+    private static final java.util.regex.Pattern SAFE_ATTRIBUTE_NAME = java.util.regex.Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_.]*$");
     private final boolean disableRequestAttributeValueStackLookup;
 
     /**
@@ -85,7 +90,8 @@ public class StrutsRequestWrapper extends HttpServletRequestWrapper {
 
             // note: we don't let # come through or else a request for
             // #attr.foo or #request.foo could cause an endless loop
-            if (!alreadyIn && !key.contains("#")) {
+            // Additionally, only allow safe attribute names to prevent OGNL injection
+            if (!alreadyIn && !key.contains("#") && SAFE_ATTRIBUTE_NAME.matcher(key).matches()) {
                 try {
                     // If not found, then try the ValueStack
                     ctx.put(REQUEST_WRAPPER_GET_ATTRIBUTE, Boolean.TRUE);
