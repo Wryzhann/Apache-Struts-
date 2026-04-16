@@ -81,6 +81,10 @@ public class CookieProviderInterceptor extends AbstractInterceptor implements Pr
         Set<Cookie> cookies = action.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
+                // Ensure SameSite attribute is set for CSRF protection
+                if (cookie.getAttribute("SameSite") == null) {
+                    cookie.setAttribute("SameSite", "Lax");
+                }
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("Sending cookie [{}] with value [{}] for domain [{}]",
                             cookie.getName(), cookie.getValue(), (cookie.getDomain() != null ? cookie.getDomain() : "no domain"));
