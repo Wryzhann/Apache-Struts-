@@ -21,13 +21,17 @@
 package org.apache.struts2.showcase.chat;
 
 import org.apache.struts2.ActionSupport;
+import org.apache.struts2.action.SessionAware;
 import org.apache.struts2.interceptor.parameter.StrutsParameter;
 
-public class CrudRoomAction extends ActionSupport {
+import java.util.Map;
+
+public class CrudRoomAction extends ActionSupport implements SessionAware {
 
 	private static final long serialVersionUID = 1L;
 
 	private ChatService chatService;
+	private Map<String, Object> session;
 
 	private String name;
 	private String description;
@@ -56,11 +60,20 @@ public class CrudRoomAction extends ActionSupport {
 	}
 
 	public String create() throws Exception {
+		User user = (User) session.get(ChatAuthenticationInterceptor.USER_SESSION_KEY);
+		if (user == null) {
+			return LOGIN;
+		}
 		try {
 			chatService.addRoom(new Room(name, description));
 		} catch (ChatException e) {
 			addActionError(e.getMessage());
 		}
 		return SUCCESS;
+	}
+
+	@Override
+	public void withSession(Map<String, Object> session) {
+		this.session = session;
 	}
 }
